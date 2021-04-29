@@ -33,7 +33,7 @@ public final class Adminstrator extends AbstractUser implements AdministratorBeh
     }
 
     @Override
-    public List<ArticleBehavior> getAuthorArticles(String authorId) throws RemoteException {
+    public List<Article> getAuthorArticles(String authorId) throws RemoteException {
         return null;
     }
 }

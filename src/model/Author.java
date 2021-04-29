@@ -1,6 +1,5 @@
 package model;
 
-import rmi.interfaces.ArticleBehavior;
 import rmi.interfaces.AuthorBehavior;
 
 import java.rmi.RemoteException;

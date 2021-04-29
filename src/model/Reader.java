@@ -26,7 +26,7 @@ public final class Reader extends AbstractUser {
     }
 
     @Override
-    public List<ArticleBehavior> getAuthorArticles(String authorId) throws RemoteException {
+    public List<Article> getAuthorArticles(String authorId) throws RemoteException {
         return null;
     }
 }
