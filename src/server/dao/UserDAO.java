@@ -2,15 +2,14 @@ package server.dao;
 
 import model.Permissions;
 import model.User;
-import server.ConnectionFactory;
+import server.factory.ConnectionFactory;
 
-import java.io.Serializable;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-public class UserDAO implements DAO<User> {
+public final class UserDAO implements DAO<User> {
+
 
     @Override
     public User get(long id) throws SQLException {
@@ -36,29 +35,39 @@ public class UserDAO implements DAO<User> {
 
 
     @Override
-    public void add(User user) throws SQLException {
+    public void create(User user) throws SQLException {
         Connection connection = ConnectionFactory.getInstance().getConnection();
-        PreparedStatement statement = connection.prepareStatement("INSERT INTO ? VALUES(?, ?, ?, ?, ?, ?)");
-        statement.setString(1, "users");
-        statement.setLong(2, user.getId());
-        statement.setString(3, user.getUsername());
-        statement.setString(4, user.getPassword());
-        statement.setInt(5, user.getPermission().getValue());
-        statement.setTimestamp(6, Timestamp.from(user.getRegistartionDate()));
+        PreparedStatement statement = connection.prepareStatement(
+                "INSERT INTO users (username, password, permission, reg_date) " +
+                "VALUES(?, ?, ?, ?)");
+        statement.setString(1, user.getUsername());
+        statement.setString(2, user.getPassword());
+        statement.setInt(3, user.getPermission().getValue());
+        statement.setTimestamp(4, Timestamp.from(user.getRegistrationDate()));
         statement.executeUpdate();
     }
 
     @Override
-    public boolean delete(User user) throws SQLException {
+    public boolean delete(long id) throws SQLException {
         Connection connection = ConnectionFactory.getInstance().getConnection();
         PreparedStatement statement = connection.prepareStatement("DELETE FROM users WHERE id=?");
-        statement.setLong(1, user.getId());
+        statement.setLong(1, id);
         return statement.executeUpdate() > 0;
     }
 
     @Override
-    public boolean update(User user) {
-        return false;
+    public boolean update(User user) throws SQLException {
+        Connection connection = ConnectionFactory.getInstance().getConnection();
+        PreparedStatement statement = connection.prepareStatement(
+                "UPDATE users SET username=?, password=?, permission=?" +
+                        "WHERE id=?"
+        );
+
+        statement.setString(1, user.getUsername());
+        statement.setString(2, user.getPassword());
+        statement.setInt(3, user.getPermission().getValue());
+        statement.setLong(4, user.getId());
+        return statement.executeUpdate() > 0;
     }
 
     private User create(ResultSet set) throws SQLException {

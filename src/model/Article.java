@@ -1,12 +1,13 @@
 package model;
 
 public final class Article implements Entity {
-    private final long id;
+    private long id;
     private String title;
     private String content;
     private User author;
 
     public Article(long id, String title, String content, User author) {
+
         this.id = id;
         this.title = title;
         this.content = content;
@@ -16,6 +17,10 @@ public final class Article implements Entity {
     @Override
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getTitle() {

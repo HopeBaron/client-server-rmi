@@ -43,7 +43,7 @@ public final class ArticleDAO implements DAO<Article> {
 
 
     @Override
-    public void add(Article article) throws SQLException {
+    public void create(Article article) throws SQLException {
         Connection connection = ConnectionFactory.getInstance().getConnection();
         PreparedStatement statement = connection.prepareStatement("INSERT INTO articles VALUES(?, ?, ?, ?)");
         statement.setLong(1, article.getId());
@@ -54,10 +54,10 @@ public final class ArticleDAO implements DAO<Article> {
     }
 
     @Override
-    public boolean delete(Article user) throws SQLException {
+    public boolean delete(long id) throws SQLException {
         Connection connection = ConnectionFactory.getInstance().getConnection();
         PreparedStatement statement = connection.prepareStatement("DELETE FROM articles WHERE id=?");
-        statement.setLong(1, user.getId());
+        statement.setLong(1, id);
         return statement.executeUpdate() > 0;
     }
 
@@ -75,6 +75,20 @@ public final class ArticleDAO implements DAO<Article> {
         return statement.executeUpdate() > 0;
     }
 
+    public List<Article> getArticlesOf(long id) throws SQLException, RemoteException {
+        Connection connection = ConnectionFactory.getInstance().getConnection();
+        PreparedStatement statement = connection.prepareStatement(
+                "SELECT FROM articles WHERE id=?"
+        );
+        ResultSet set = statement.executeQuery();
+        ArrayList<Article> articles = new ArrayList<>();
+        while (set.next()) {
+            articles.add(create(set));
+        }
+        return articles;
+    }
+
+
     private Article create(ResultSet set) throws SQLException, RemoteException {
         return new Article(
                 set.getLong("id"),
@@ -83,4 +97,5 @@ public final class ArticleDAO implements DAO<Article> {
                 userDAO.get(set.getLong("author_id"))
         );
     }
+
 }

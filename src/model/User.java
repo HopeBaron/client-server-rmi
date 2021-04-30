@@ -2,14 +2,13 @@ package model;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.List;
 
 public final class User implements Serializable {
-    private final long id;
+    private long id;
     private String username;
     private String password;
     private Permissions permission;
-    private Instant registrationDate;
+    private final Instant registrationDate;
 
     public User(long id, String username, String password, Permissions permission, Instant registrationDate) {
         this.id = id;
@@ -21,6 +20,10 @@ public final class User implements Serializable {
 
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getUsername() {
@@ -43,11 +46,7 @@ public final class User implements Serializable {
         return permission;
     }
 
-    public Instant getRegistartionDate() {
+    public Instant getRegistrationDate() {
         return registrationDate;
-    }
-
-    public void setRegistartionDate(Instant registartionDate) {
-        this.registrationDate = registartionDate;
     }
 }
