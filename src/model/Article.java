@@ -1,49 +1,45 @@
 package model;
 
-import rmi.interfaces.ArticleBehavior;
-
-import java.rmi.RemoteException;
-
-public final class Article implements ArticleBehavior {
-    private final String id;
+public final class Article implements Entity {
+    private final long id;
     private String title;
-    private final Author author;
     private String content;
+    private User author;
 
-    public Article(String id, String title, Author author, String content) {
+    public Article(long id, String title, String content, User author) {
         this.id = id;
         this.title = title;
-        this.author = author;
         this.content = content;
+        this.author = author;
     }
 
     @Override
+    public long getId() {
+        return id;
+    }
+
     public String getTitle() {
         return title;
     }
 
-    @Override
-    public Author getAuthor() {
-        return author;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    @Override
     public String getContent() {
         return content;
     }
 
-    @Override
-    public Article setTitle(String title) {
-        this.title = title;
-    }
-
-    @Override
-    public Article setContent(String content) {
+    public void setContent(String content) {
         this.content = content;
     }
 
-    @Override
-    public String getId() throws RemoteException {
-        return null;
+    public User getAuthor() {
+        return author;
     }
+
+    public void setAuthor(User author) {
+        this.author = author;
+    }
+
 }
