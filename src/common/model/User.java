@@ -1,4 +1,4 @@
-package model;
+package common.model;
 
 import java.io.Serializable;
 import java.time.Instant;

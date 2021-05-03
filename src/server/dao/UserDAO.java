@@ -1,7 +1,7 @@
 package server.dao;
 
-import model.Permissions;
-import model.User;
+import common.model.Permissions;
+import common.model.User;
 import server.factory.ConnectionFactory;
 
 import java.sql.*;
@@ -21,6 +21,16 @@ public final class UserDAO implements DAO<User> {
         return create(set);
     }
 
+
+    public User get(String username) throws SQLException {
+        Connection connection = ConnectionFactory.getInstance().getConnection();
+        PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE username=?");
+        statement.setString(1, username);
+        ResultSet set = statement.executeQuery();
+        if (!set.next()) return null;
+        return create(set);
+    }
+
     @Override
     public List<User> getAll() throws SQLException {
         Connection connection = ConnectionFactory.getInstance().getConnection();
@@ -35,7 +45,7 @@ public final class UserDAO implements DAO<User> {
 
 
     @Override
-    public void create(User user) throws SQLException {
+    public boolean create(User user) throws SQLException {
         Connection connection = ConnectionFactory.getInstance().getConnection();
         PreparedStatement statement = connection.prepareStatement(
                 "INSERT INTO users (username, password, permission, reg_date) " +
@@ -44,7 +54,7 @@ public final class UserDAO implements DAO<User> {
         statement.setString(2, user.getPassword());
         statement.setInt(3, user.getPermission().getValue());
         statement.setTimestamp(4, Timestamp.from(user.getRegistrationDate()));
-        statement.executeUpdate();
+        return statement.executeUpdate() > 0;
     }
 
     @Override

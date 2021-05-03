@@ -1,7 +1,7 @@
 package server.dao;
 
-import model.Article;
-import model.User;
+import common.model.Article;
+import common.model.User;
 import server.factory.ConnectionFactory;
 
 import java.rmi.RemoteException;
@@ -20,7 +20,7 @@ public final class ArticleDAO implements DAO<Article> {
     }
 
     @Override
-    public Article get(long id) throws SQLException, RemoteException {
+    public Article get(long id) throws SQLException {
         Connection connection = ConnectionFactory.getInstance().getConnection();
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM articles WHERE id=?");
         statement.setLong(1, id);
@@ -30,7 +30,7 @@ public final class ArticleDAO implements DAO<Article> {
     }
 
     @Override
-    public List<Article> getAll() throws SQLException, RemoteException {
+    public List<Article> getAll() throws SQLException {
         Connection connection = ConnectionFactory.getInstance().getConnection();
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM articles");
         ResultSet set = statement.executeQuery();
@@ -43,14 +43,14 @@ public final class ArticleDAO implements DAO<Article> {
 
 
     @Override
-    public void create(Article article) throws SQLException {
+    public boolean create(Article article) throws SQLException {
         Connection connection = ConnectionFactory.getInstance().getConnection();
         PreparedStatement statement = connection.prepareStatement("INSERT INTO articles VALUES(?, ?, ?, ?)");
         statement.setLong(1, article.getId());
         statement.setString(2, article.getTitle());
         statement.setString(3, article.getContent());
         statement.setLong(4, article.getAuthor().getId());
-        statement.executeUpdate();
+        return statement.executeUpdate() > 0;
     }
 
     @Override
@@ -89,7 +89,7 @@ public final class ArticleDAO implements DAO<Article> {
     }
 
 
-    private Article create(ResultSet set) throws SQLException, RemoteException {
+    private Article create(ResultSet set) throws SQLException {
         return new Article(
                 set.getLong("id"),
                 set.getString("title"),

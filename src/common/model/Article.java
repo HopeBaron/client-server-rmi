@@ -1,4 +1,4 @@
-package model;
+package common.model;
 
 public final class Article implements Entity {
     private long id;
