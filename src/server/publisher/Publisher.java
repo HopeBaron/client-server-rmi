@@ -2,7 +2,7 @@ package server.publisher;
 
 import common.subscriber.Subscriber;
 
-import java.util.Set;
+import java.util.Collection;
 
 public interface Publisher<T> {
 
@@ -10,7 +10,7 @@ public interface Publisher<T> {
 
     public boolean removeSubscriber(Subscriber<T> subscriber);
 
-    public Set<Subscriber<T>> getSubscribers();
+    public Collection<Subscriber<T>> getSubscribers();
 
     public void notifySubscribers(T data);
 }

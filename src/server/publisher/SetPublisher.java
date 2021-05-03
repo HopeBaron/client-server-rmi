@@ -1,12 +1,11 @@
 package server.publisher;
 
-import common.model.Article;
 import common.subscriber.Subscriber;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class SetPublisher<T> implements Publisher<T> {
+public final class SetPublisher<T> implements Publisher<T> {
     private HashSet<Subscriber<T>> subscribers = new HashSet<>();
 
     @Override

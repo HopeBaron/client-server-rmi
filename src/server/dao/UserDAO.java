@@ -86,7 +86,8 @@ public final class UserDAO implements DAO<User> {
                 set.getString("username"),
                 set.getString("password"),
                 new Permissions(set.getInt("permission")),
-                set.getTimestamp("reg_date").toInstant()
+                set.getTimestamp("reg_date").toInstant(),
+                set.getBoolean("active")
         );
     }
 }

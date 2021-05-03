@@ -56,8 +56,9 @@ public final class ArticleDAO implements DAO<Article> {
     @Override
     public boolean delete(long id) throws SQLException {
         Connection connection = ConnectionFactory.getInstance().getConnection();
-        PreparedStatement statement = connection.prepareStatement("DELETE FROM articles WHERE id=?");
-        statement.setLong(1, id);
+        PreparedStatement statement = connection.prepareStatement("UPDATE articles SET active=? WHERE id=?");
+        statement.setBoolean(1, false);
+        statement.setLong(2, id);
         return statement.executeUpdate() > 0;
     }
 
@@ -65,8 +66,8 @@ public final class ArticleDAO implements DAO<Article> {
     public boolean update(Article article) throws SQLException {
         Connection connection = ConnectionFactory.getInstance().getConnection();
         PreparedStatement statement = connection.prepareStatement(
-                "UPDATE users SET title=?, content=?+ " +
-                        "WHERE id = ? "
+                "UPDATE users SET title=?, content=?" +
+                        "WHERE id = ?"
         );
 
         statement.setString(1, article.getTitle());
