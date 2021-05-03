@@ -3,9 +3,9 @@ package server.connection;
 import server.service.ArticleService;
 import server.service.UserService;
 
-public class Connection {
-    private UserService userService;
-    private ArticleService articleService;
+public final class Connection {
+    private final UserService userService;
+    private final ArticleService articleService;
 
     public Connection(UserService userService, ArticleService articleService) {
         this.userService = userService;
