@@ -6,7 +6,7 @@ import java.util.BitSet;
 
 public final class Permissions implements Serializable {
     public Permissions(int value) {
-        ByteBuffer buf = ByteBuffer.allocate(1);
+        ByteBuffer buf = ByteBuffer.allocate(4);
         buf.putInt(value);
         set = BitSet.valueOf(buf);
     }

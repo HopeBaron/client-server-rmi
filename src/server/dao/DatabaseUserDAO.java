@@ -2,13 +2,15 @@ package server.dao;
 
 import common.model.Permissions;
 import common.model.User;
+import server.dao.behaviors.CRUDDAO;
+import server.dao.behaviors.UserDAO;
 import server.factory.ConnectionFactory;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class UserDAO implements DAO<User> {
+public final class DatabaseUserDAO implements UserDAO {
 
 
     @Override
@@ -22,7 +24,7 @@ public final class UserDAO implements DAO<User> {
     }
 
 
-    public User get(String username) throws SQLException {
+    public User getUserByName(String username) throws SQLException {
         Connection connection = ConnectionFactory.getInstance().getConnection();
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM users WHERE username=?");
         statement.setString(1, username);

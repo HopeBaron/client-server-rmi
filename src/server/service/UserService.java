@@ -2,16 +2,21 @@ package server.service;
 
 import common.model.Permission;
 import common.model.User;
-import server.dao.UserDAO;
-import server.publisher.SetPublisher;
+import server.dao.behaviors.UserDAO;
+import server.publisher.Publisher;
 
 import java.rmi.RemoteException;
 import java.rmi.ServerError;
 import java.sql.SQLException;
 
-public class UserService {
-    private UserDAO userDAO;
-    private SetPublisher<User> publisher = new SetPublisher<>();
+public final class UserService {
+    private final UserDAO userDAO;
+    private final Publisher<User> publisher;
+
+    public UserService(UserDAO userDAO, Publisher<User> publisher) {
+        this.userDAO = userDAO;
+        this.publisher = publisher;
+    }
     public User get(long id) throws RemoteException {
         try {
             return userDAO.get(id);
@@ -50,7 +55,16 @@ public class UserService {
             throw new ServerError("Internal error", null);
         }
     }
-    public SetPublisher<User> getPublisher() {
+    public Publisher<User> getPublisher() {
         return publisher;
+    }
+
+    public User getUserByName(String username) throws ServerError {
+        try {
+            return userDAO.getUserByName(username);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            throw new ServerError("Internal server error", null);
+        }
     }
 }

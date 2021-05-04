@@ -2,6 +2,8 @@ package server.dao;
 
 import common.model.Article;
 import common.model.User;
+import server.dao.behaviors.ArticleDAO;
+import server.dao.behaviors.CRUDDAO;
 import server.factory.ConnectionFactory;
 
 import java.rmi.RemoteException;
@@ -12,10 +14,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class ArticleDAO implements DAO<Article> {
-    DAO<User> userDAO;
+public final class DatabaseArticleDAO implements ArticleDAO {
+    CRUDDAO<User> userDAO;
 
-    public ArticleDAO(DAO<User> userDAO) {
+    public DatabaseArticleDAO(CRUDDAO<User> userDAO) {
         this.userDAO = userDAO;
     }
 

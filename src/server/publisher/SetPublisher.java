@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public final class SetPublisher<T> implements Publisher<T> {
-    private HashSet<Subscriber<T>> subscribers = new HashSet<>();
+    private final HashSet<Subscriber<T>> subscribers = new HashSet<>();
 
     @Override
     public boolean addSubscriber(Subscriber<T> subscriber) {

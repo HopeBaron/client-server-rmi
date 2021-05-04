@@ -1,15 +1,15 @@
 package server.service;
 
 import common.model.Article;
-import server.dao.ArticleDAO;
-import server.dao.UserDAO;
+import server.dao.behaviors.ArticleDAO;
+import server.dao.behaviors.UserDAO;
 import server.publisher.SetPublisher;
 
 import java.rmi.RemoteException;
 import java.rmi.ServerError;
 import java.sql.SQLException;
 
-public class ArticleService {
+public final class ArticleService {
     private SetPublisher<Article> publisher = new SetPublisher<>();
     private ArticleDAO articleDAO;
     private UserDAO userDAO;
@@ -22,7 +22,7 @@ public class ArticleService {
         }
     }
 
-    public Article delete(long id) throws RemoteException {
+    public Article delete(long invoker,long id) throws RemoteException {
         try {
             Article target = articleDAO.get(id);
             articleDAO.delete(id);
@@ -32,6 +32,7 @@ public class ArticleService {
             throw new ServerError("Internal server error", null);
         }
     }
+
 
     public SetPublisher<Article> getPublisher() {
         return publisher;

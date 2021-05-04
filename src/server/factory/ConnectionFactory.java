@@ -5,10 +5,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class ConnectionFactory {
-    String driverClassName = "com.mysql.jdbc.Driver";
+    String driverClassName = "org.mariadb.jdbc.Driver";
     String connectionUrl = "jdbc:mysql://localhost/rmi";
-    String dbUser = "root";
-    String dbPwd = "root";
+    String dbUser = "rmiUser";
+    String dbPwd = "rmi";
 
     private static ConnectionFactory connectionFactory = null;
 
