@@ -10,8 +10,9 @@ import server.service.UserService;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 
-public final class ConnectionImpl extends UnicastRemoteObject implements Connection  {
+public final class ConnectionImpl extends UnicastRemoteObject implements Connection {
     private final UserService userService;
     private final ArticleService articleService;
     private final ProxyPublisher<User> userProxyPublisher;
@@ -33,11 +34,36 @@ public final class ConnectionImpl extends UnicastRemoteObject implements Connect
     }
 
     public User getUserByName(String username) throws RemoteException {
-        return userService.getUserByName(username);
+        return userService.getUserByName(userId, username);
     }
 
     public User deleteUser(long targetUser) throws RemoteException {
         return userService.delete(userId, targetUser);
+    }
+
+    @Override
+    public Article getArticle(long id) throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public Article deleteArticle(long id) throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public List<Article> getArticles() throws RemoteException {
+        return null;
+    }
+
+    @Override
+    public List<Article> getArticlesOf(long target) throws RemoteException {
+        return articleService.getArticlesOf(userId, target);
+    }
+
+    @Override
+    public List<User> getUsers() throws RemoteException {
+        return userService.getAllUsers(userId);
     }
 
     @Override

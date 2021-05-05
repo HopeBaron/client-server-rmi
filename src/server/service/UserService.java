@@ -8,6 +8,7 @@ import server.publisher.Publisher;
 import java.rmi.RemoteException;
 import java.rmi.ServerError;
 import java.sql.SQLException;
+import java.util.List;
 
 public final class UserService {
     private final UserDAO userDAO;
@@ -33,7 +34,8 @@ public final class UserService {
         if(!canModifyOthers && !isSelf) throw new ServerError("You don't have permission to delete this user",null);
             userDAO.delete(target);
             return targetUser;
-        } catch (SQLException throwables) {
+        } catch (SQLException e) {
+            e.getStackTrace();
             throw new ServerError("Internal error", null);
         }
     }
@@ -59,10 +61,19 @@ public final class UserService {
         return publisher;
     }
 
-    public User getUserByName(String username) throws ServerError {
+    public User getUserByName(long invoker, String username) throws ServerError {
         try {
             return userDAO.getUserByName(username);
         } catch (SQLException throwables) {
+            throwables.printStackTrace();
+            throw new ServerError("Internal server error", null);
+        }
+    }
+
+    public List<User> getAllUsers(long invoker) throws ServerError {
+        try {
+            return userDAO.getAll();
+        }catch (SQLException throwables) {
             throwables.printStackTrace();
             throw new ServerError("Internal server error", null);
         }

@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class ConnectionFactory {
+public final class ConnectionFactory {
     String driverClassName = "org.mariadb.jdbc.Driver";
     String connectionUrl = "jdbc:mysql://localhost/rmi";
     String dbUser = "rmiUser";

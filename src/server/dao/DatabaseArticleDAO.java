@@ -69,7 +69,7 @@ public final class DatabaseArticleDAO implements ArticleDAO {
         Connection connection = ConnectionFactory.getInstance().getConnection();
         PreparedStatement statement = connection.prepareStatement(
                 "UPDATE users SET title=?, content=?" +
-                        "WHERE id = ?"
+                        "WHERE id =?"
         );
 
         statement.setString(1, article.getTitle());
@@ -78,11 +78,12 @@ public final class DatabaseArticleDAO implements ArticleDAO {
         return statement.executeUpdate() > 0;
     }
 
-    public List<Article> getArticlesOf(long id) throws SQLException, RemoteException {
+    public List<Article> getArticlesOf(long id) throws SQLException {
         Connection connection = ConnectionFactory.getInstance().getConnection();
         PreparedStatement statement = connection.prepareStatement(
-                "SELECT FROM articles WHERE id=?"
+                "SELECT * FROM articles WHERE author_id=?"
         );
+        statement.setLong(1, id);
         ResultSet set = statement.executeQuery();
         ArrayList<Article> articles = new ArrayList<>();
         while (set.next()) {
