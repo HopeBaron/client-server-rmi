@@ -21,6 +21,8 @@ public class ReadingController {
     private JButton saveButton;
 
     public ReadingController(Connection connection) {
+        DefaultTreeModel model = (DefaultTreeModel) tree1.getModel();
+        model.setRoot(new DefaultMutableTreeNode("Articles"));
         updateList(connection);
         refreshButton.addActionListener(e -> {
             updateList(connection);
@@ -56,8 +58,6 @@ public class ReadingController {
 
     private void updateList(Connection connection) {
 
-        DefaultTreeModel model = (DefaultTreeModel) tree1.getModel();
-        model.setRoot(new DefaultMutableTreeNode("Articles"));
         try {
             for (User user : connection.getUsers()) {
 
@@ -66,7 +66,7 @@ public class ReadingController {
                     DefaultMutableTreeNode node = new DefaultMutableTreeNode(new ArticleTreeNode(article));
                     userNode.add(node);
                 }
-                DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
+                DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree1.getModel().getRoot();
                 root.add(userNode);
             }
         } catch (RemoteException e) {
