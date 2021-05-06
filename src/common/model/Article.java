@@ -5,13 +5,15 @@ public final class Article implements Entity {
     private String title;
     private String content;
     private User author;
+    private boolean shown;
 
-    public Article(long id, String title, String content, User author) {
+    public Article(long id, String title, String content, User author, boolean shown) {
 
         this.id = id;
         this.title = title;
         this.content = content;
         this.author = author;
+        this.shown = shown;
     }
 
     @Override
@@ -47,4 +49,11 @@ public final class Article implements Entity {
         this.author = author;
     }
 
+    public void setShown(boolean value) {
+        this.shown = value;
+    }
+
+    public boolean isShown() {
+        return shown;
+    }
 }

@@ -8,7 +8,7 @@ public interface CRUDDAO<T>  {
 
     List<T> getAll() throws SQLException;
 
-    boolean create(T t) throws SQLException;
+    T create(T t) throws SQLException;
 
     T get(long id) throws SQLException;
 

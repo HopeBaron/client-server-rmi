@@ -59,4 +59,8 @@ public final class User implements Serializable {
     public void setActive(boolean activeState) {
         this.active = activeState;
     }
+
+    public void setPermission(Permissions permission) {
+        this.permission = permission;
+    }
 }

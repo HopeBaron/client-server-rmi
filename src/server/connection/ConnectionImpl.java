@@ -3,8 +3,6 @@ package server.connection;
 import common.model.Article;
 import common.model.User;
 import common.rmi.Connection;
-import common.rmi.ProxyPublisher;
-import server.publisher.proxy.ProxyDelegatePublisher;
 import server.service.ArticleService;
 import server.service.UserService;
 
@@ -15,8 +13,6 @@ import java.util.List;
 public final class ConnectionImpl extends UnicastRemoteObject implements Connection {
     private final UserService userService;
     private final ArticleService articleService;
-    private final ProxyPublisher<User> userProxyPublisher;
-    private final ProxyPublisher<Article> articleProxyPublisher;
     private final long userId;
 
     public ConnectionImpl(long userId, UserService userService, ArticleService articleService) throws RemoteException {
@@ -24,26 +20,24 @@ public final class ConnectionImpl extends UnicastRemoteObject implements Connect
         this.userService = userService;
         this.articleService = articleService;
         this.userId = userId;
-        this.userProxyPublisher = new ProxyDelegatePublisher<>(userService.getPublisher());
-        this.articleProxyPublisher = new ProxyDelegatePublisher<>(articleService.getPublisher());
     }
 
 
     public User getUser(long userId) throws RemoteException {
-        return userService.get(userId);
+        return userService.getUser(this.userId, userId);
     }
 
     public User getUserByName(String username) throws RemoteException {
-        return userService.getUserByName(userId, username);
+        return userService.getUserByName(username);
     }
 
-    public User deleteUser(long targetUser) throws RemoteException {
+    public boolean deleteUser(long targetUser) throws RemoteException {
         return userService.delete(userId, targetUser);
     }
 
     @Override
     public Article getArticle(long id) throws RemoteException {
-        return null;
+        return articleService.getArticle(userId, id);
     }
 
     @Override
@@ -53,7 +47,7 @@ public final class ConnectionImpl extends UnicastRemoteObject implements Connect
 
     @Override
     public List<Article> getArticles() throws RemoteException {
-        return null;
+        return articleService.getAll(userId);
     }
 
     @Override
@@ -63,17 +57,18 @@ public final class ConnectionImpl extends UnicastRemoteObject implements Connect
 
     @Override
     public List<User> getUsers() throws RemoteException {
-        return userService.getAllUsers(userId);
+        return userService.getAll(userId);
+    }
+
+
+    @Override
+    public User addUser(User user) throws RemoteException {
+        return null;
     }
 
     @Override
-    public ProxyPublisher<User> getUserPublisher() throws RemoteException {
-        return userProxyPublisher;
-    }
-
-    @Override
-    public ProxyPublisher<Article> getArticlePublisher() throws RemoteException {
-        return articleProxyPublisher;
+    public Article addArticle(Article article) throws RemoteException {
+        return articleService.addArticle(userId, article);
     }
 
     @Override
@@ -81,7 +76,8 @@ public final class ConnectionImpl extends UnicastRemoteObject implements Connect
         return userId;
     }
 
-    public void logout() {
-
+    @Override
+    public User getCurrentUser() throws RemoteException {
+        return userService.getUser(userId, userId);
     }
 }

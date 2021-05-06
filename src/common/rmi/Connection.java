@@ -13,7 +13,7 @@ public interface Connection extends Remote {
 
     User getUserByName(String username) throws RemoteException;
 
-    User deleteUser(long targetUser) throws RemoteException;
+    boolean deleteUser(long targetUser) throws RemoteException;
 
     Article getArticle(long id) throws RemoteException;
 
@@ -25,9 +25,11 @@ public interface Connection extends Remote {
 
     List<User> getUsers() throws RemoteException;
 
-    ProxyPublisher<User> getUserPublisher() throws RemoteException;
+    public User addUser(User user) throws RemoteException;
 
-    ProxyPublisher<Article> getArticlePublisher() throws RemoteException;
+    public Article addArticle(Article article) throws RemoteException;
 
     long getCurrentUserId() throws RemoteException;
+
+    User getCurrentUser() throws RemoteException;
 }
