@@ -1,81 +1,91 @@
 package server.service;
 
+import common.exception.ErrorCode;
+import common.exception.RemoteAuthenticationException;
+import common.exception.RemoteInternalServerError;
 import common.model.Permission;
+import common.model.Permissions;
 import common.model.User;
 import server.dao.behaviors.UserDAO;
-import server.publisher.Publisher;
 
 import java.rmi.RemoteException;
-import java.rmi.ServerError;
 import java.sql.SQLException;
 import java.util.List;
 
 public final class UserService {
-    private final UserDAO userDAO;
-    private final Publisher<User> publisher;
+    private UserDAO userDAO;
 
-    public UserService(UserDAO userDAO, Publisher<User> publisher) {
+    public UserService(UserDAO userDAO) {
         this.userDAO = userDAO;
-        this.publisher = publisher;
     }
-    public User get(long id) throws RemoteException {
+
+    public List<User> getAll(long invoker) throws RemoteException {
         try {
-            return userDAO.get(id);
-        } catch (SQLException ignored) {
-            throw new ServerError("Internal error", null);
-        }
-    }
-    public User delete(long invoker, long target) throws RemoteException {
-        try {
-        User sourceUser = userDAO.get(invoker);
-        User targetUser = userDAO.get(target);
-        boolean canModifyOthers = sourceUser.getPermission().contains(Permission.MODIFY_OTHERS);
-        boolean isSelf = sourceUser.getId() == targetUser.getId();
-        if(!canModifyOthers && !isSelf) throw new ServerError("You don't have permission to delete this user",null);
-            userDAO.delete(target);
-            return targetUser;
+            User invokerUser = userDAO.get(invoker);
+            if (!invokerUser.isActive()) {
+                throw new RemoteAuthenticationException(ErrorCode.MISSING_ACCESS);
+            } else if (!invokerUser.getPermission().contains(Permission.MODIFY_OTHERS))
+                return userDAO.getStateUsers(true);
+
+            else return userDAO.getAll();
+
         } catch (SQLException e) {
-            e.getStackTrace();
-            throw new ServerError("Internal error", null);
+            e.printStackTrace();
+            throw new RemoteInternalServerError();
+        }
+    }
+    public boolean delete(long invoker, long target) throws RemoteAuthenticationException, RemoteInternalServerError {
+        try {
+            User invokerUser = userDAO.get(invoker);
+            if (!invokerUser.isActive()) throw new RemoteAuthenticationException(ErrorCode.MISSING_ACCESS);
+            else if (!invokerUser.getPermission().contains(Permission.MODIFY_OTHERS) && invoker != target)
+                throw new RemoteAuthenticationException(ErrorCode.MISSING_PERMISSION);
+            else return userDAO.delete(target);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RemoteInternalServerError();
+        }
+
+    }
+    public User getUser(long invoker, long id) throws RemoteException {
+        try {
+        User invokerUser = userDAO.get(invoker);
+        User targetUser = userDAO.get(id);
+            if (!invokerUser.isActive()) {
+                throw new RemoteAuthenticationException(ErrorCode.MISSING_ACCESS);
+            } else if (!invokerUser.getPermission().contains(Permission.MODIFY_OTHERS) && !targetUser.isActive())
+                return null;
+            else return targetUser;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RemoteInternalServerError();
         }
     }
 
-
-    public User update(long invoker, User target) throws RemoteException {
+    public User newUser(User user) throws RemoteException {
         try {
-            User sourceUser = userDAO.get(invoker);
-            User targetUserFromDB = userDAO.get(target.getId());
-            boolean canModifyOthers = sourceUser.getPermission().contains(Permission.MODIFY_OTHERS);
-            boolean isSelf = sourceUser.getId() == targetUserFromDB.getId();
-            if(!canModifyOthers && !isSelf) throw new ServerError("You don't have permission to delete this user",null);
-            userDAO.update(target);
-            User result = userDAO.get(target.getId());
-            publisher.notifySubscribers(result);
-            return result;
+        User foundUser = userDAO.getUserByName(user.getUsername());
+        if(foundUser != null) throw new RemoteAuthenticationException(ErrorCode.ALREADY_EXIST);
+        Permissions perms = new Permissions();
+        perms.add(Permission.WRITE);
+        user.setPermission(perms);
 
-        } catch (SQLException throwables) {
-            throw new ServerError("Internal error", null);
-        }
-    }
-    public Publisher<User> getPublisher() {
-        return publisher;
-    }
-
-    public User getUserByName(long invoker, String username) throws ServerError {
-        try {
-            return userDAO.getUserByName(username);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            throw new ServerError("Internal server error", null);
+            return userDAO.create(user);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RemoteInternalServerError();
         }
     }
 
-    public List<User> getAllUsers(long invoker) throws ServerError {
+    public User getUserByName(String username) throws RemoteInternalServerError, RemoteAuthenticationException {
         try {
-            return userDAO.getAll();
-        }catch (SQLException throwables) {
-            throwables.printStackTrace();
-            throw new ServerError("Internal server error", null);
+            User targetUser = userDAO.getUserByName(username);
+             if (!targetUser.isActive())
+                return null;
+            else return targetUser;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RemoteInternalServerError();
         }
     }
 }
