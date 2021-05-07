@@ -2,7 +2,7 @@ package common.model;
 
 public enum Permission {
     WRITE(2),
-    MODIFY_OTHERS(6);
+    MODIFY_OTHERS(4);
 
     private int value;
 

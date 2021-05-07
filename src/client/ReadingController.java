@@ -58,6 +58,7 @@ public class ReadingController {
         model.setRoot(new DefaultMutableTreeNode("Articles"));
         tree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
+
         try {
             for (User user : connection.getUsers()) {
 

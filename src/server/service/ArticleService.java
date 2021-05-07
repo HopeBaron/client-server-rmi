@@ -43,9 +43,7 @@ public final class ArticleService {
             User invokerUser = userDAO.get(invoker);
 
             if (!invokerUser.isActive()) throw new RemoteAuthenticationException(ErrorCode.MISSING_ACCESS);
-            else if (!invokerUser.getPermission().contains(Permission.MODIFY_OTHERS))
-                return articleDAO.getStateArticles(true);
-
+            else if (!invokerUser.getPermission().contains(Permission.MODIFY_OTHERS)) return articleDAO.getStateArticles(true);
             else return articleDAO.getAll();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -86,9 +84,7 @@ public final class ArticleService {
             User invokerUser = userDAO.get(invoker);
 
             if (!invokerUser.isActive()) throw new RemoteAuthenticationException(ErrorCode.MISSING_ACCESS);
-            else if (!invokerUser.getPermission().contains(Permission.MODIFY_OTHERS))
-                return articleDAO.getStateArticlesOf(target, true);
-
+            else if (!invokerUser.getPermission().contains(Permission.MODIFY_OTHERS)) return articleDAO.getStateArticlesOf(target, true);
             else return articleDAO.getArticlesOf(target);
         } catch (SQLException e) {
             e.printStackTrace();

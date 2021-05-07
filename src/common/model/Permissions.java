@@ -1,14 +1,12 @@
 package common.model;
 
 import java.io.Serializable;
-import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.BitSet;
 
 public final class Permissions implements Serializable {
     public Permissions(int value) {
-        ByteBuffer buf = ByteBuffer.allocate(4);
-        buf.putInt(value);
-        set = BitSet.valueOf(buf);
+        set = BitSet.valueOf(new long[]{value});
     }
 
     public Permissions() {
@@ -18,7 +16,9 @@ public final class Permissions implements Serializable {
     private final BitSet set;
 
     public boolean contains(Permission perm) {
+        System.out.println(Arrays.toString(set.toByteArray()));
         return set.get(perm.getValue() / 2);
+
     }
 
     public boolean contains(Permissions permissions) {
