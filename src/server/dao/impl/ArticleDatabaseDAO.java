@@ -32,6 +32,7 @@ public class ArticleDatabaseDAO implements ArticleDAO {
         while (resultSet.next()) {
             list.add(formate(resultSet));
         }
+        statement.close();
         return list;
     }
 
@@ -48,6 +49,9 @@ public class ArticleDatabaseDAO implements ArticleDAO {
         while (resultSet.next()) {
             list.add(formate(resultSet));
         }
+
+
+        statement.close();
         return list;
     }
 
@@ -65,6 +69,7 @@ public class ArticleDatabaseDAO implements ArticleDAO {
         while (resultSet.next()) {
             list.add(formate(resultSet));
         }
+        statement.close();
         return list;
     }
 
@@ -79,6 +84,9 @@ public class ArticleDatabaseDAO implements ArticleDAO {
         while (resultSet.next()) {
             list.add(formate(resultSet));
         }
+
+        ;
+        statement.close();
         return list;
     }
 
@@ -96,7 +104,10 @@ public class ArticleDatabaseDAO implements ArticleDAO {
         statement.executeUpdate();
         ResultSet keys = statement.getGeneratedKeys();
         if (!keys.next()) return null;
-        return formate(keys);
+        Article res = formate(keys);
+        statement.close();
+        keys.close();
+        return res;
 
     }
 
@@ -106,20 +117,27 @@ public class ArticleDatabaseDAO implements ArticleDAO {
         PreparedStatement statement = connection.prepareStatement(
                 "SELECT * FROM articles WHERE id=?"
         );
+        statement.setLong(1, id);
         ResultSet resultSet = statement.executeQuery();
+        statement.close();
         if (!resultSet.next()) return null;
-        return formate(resultSet);
+        Article res = formate(resultSet);
+        return res;
     }
 
     @Override
     public boolean delete(long id) throws SQLException {
         Connection connection = ConnectionFactory.getInstance().getConnection();
         PreparedStatement statement = connection.prepareStatement(
-                "UPDATE articles SET show=? WHERE id=?"
+                "UPDATE articles SET shown=? WHERE id=?"
         );
         statement.setBoolean(1, false);
         statement.setLong(2, id);
-        return statement.executeUpdate() > 0;
+
+        boolean res = statement.executeUpdate() > 0;
+        statement.close();
+
+        return res;
     }
 
     @Override
@@ -132,7 +150,9 @@ public class ArticleDatabaseDAO implements ArticleDAO {
         statement.setString(2, article.getContent());
         statement.setBoolean(3, article.isShown());
         statement.setLong(4, article.getId());
-        return statement.executeUpdate() > 0;
+        boolean res = statement.executeUpdate() > 0;
+        statement.close();
+        return res;
     }
 
     private Article formate(ResultSet resultSet) throws SQLException {

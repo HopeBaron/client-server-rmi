@@ -72,7 +72,7 @@ public final class ArticleService {
             if (!invokerUser.isActive()) throw new RemoteAuthenticationException(ErrorCode.MISSING_ACCESS);
 
             Permissions perms = invokerUser.getPermission();
-            if (!perms.contains(Permission.MODIFY_OTHERS) || article.getAuthor().getId() != invokerUser.getId())
+            if (!perms.contains(Permission.MODIFY_OTHERS) && article.getAuthor().getId() != invokerUser.getId())
                 throw new RemoteAuthenticationException(ErrorCode.MISSING_PERMISSION);
             else return articleDAO.delete(article.getId());
         } catch (SQLException e) {

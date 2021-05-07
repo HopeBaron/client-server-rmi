@@ -9,6 +9,7 @@ import common.rmi.Connection;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeSelectionModel;
 import java.rmi.RemoteException;
 
 public class ReadingController {
@@ -21,13 +22,8 @@ public class ReadingController {
     private JButton saveButton;
 
     public ReadingController(Connection connection) {
-        DefaultTreeModel model = (DefaultTreeModel) tree1.getModel();
-        model.setRoot(new DefaultMutableTreeNode("Articles"));
         updateList(connection);
-        refreshButton.addActionListener(e -> {
-            updateList(connection);
-
-        });
+        refreshButton.addActionListener(e -> updateList(connection));
         saveButton.addActionListener(e -> {
             try {
                 connection.addArticle(new Article(0, textField1.getText(), editorPane1.getText(), connection.getCurrentUser(), true));
@@ -43,6 +39,7 @@ public class ReadingController {
 
         tree1.addTreeSelectionListener(e -> {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree1.getLastSelectedPathComponent();
+            if(node == null) return;
             Object userObject = node.getUserObject();
             if (userObject instanceof ArticleTreeNode) {
                 Article o = ((ArticleTreeNode) userObject).getArticle();
@@ -57,6 +54,9 @@ public class ReadingController {
     }
 
     private void updateList(Connection connection) {
+        DefaultTreeModel model = (DefaultTreeModel) tree1.getModel();
+        model.setRoot(new DefaultMutableTreeNode("Articles"));
+        tree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 
         try {
             for (User user : connection.getUsers()) {
@@ -69,6 +69,7 @@ public class ReadingController {
                 DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree1.getModel().getRoot();
                 root.add(userNode);
             }
+            model.reload();
         } catch (RemoteException e) {
             e.printStackTrace();
         }

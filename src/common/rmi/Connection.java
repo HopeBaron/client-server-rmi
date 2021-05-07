@@ -17,7 +17,7 @@ public interface Connection extends Remote {
 
     Article getArticle(long id) throws RemoteException;
 
-    Article deleteArticle(long id) throws RemoteException;
+    boolean deleteArticle(long id) throws RemoteException;
 
     List<Article> getArticles() throws RemoteException;
 
@@ -25,9 +25,9 @@ public interface Connection extends Remote {
 
     List<User> getUsers() throws RemoteException;
 
-    public User addUser(User user) throws RemoteException;
+    User addUser(User user) throws RemoteException;
 
-    public Article addArticle(Article article) throws RemoteException;
+    Article addArticle(Article article) throws RemoteException;
 
     long getCurrentUserId() throws RemoteException;
 

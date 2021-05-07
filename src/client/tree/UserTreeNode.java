@@ -9,6 +9,7 @@ public class UserTreeNode {
     }
     @Override
     public String toString() {
+        if(!user.isActive()) return "Deleted - " + user.getUsername();
         return user.getUsername();
     }
 

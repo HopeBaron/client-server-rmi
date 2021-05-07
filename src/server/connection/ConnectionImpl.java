@@ -41,8 +41,8 @@ public final class ConnectionImpl extends UnicastRemoteObject implements Connect
     }
 
     @Override
-    public Article deleteArticle(long id) throws RemoteException {
-        return null;
+    public boolean deleteArticle(long id) throws RemoteException {
+        return articleService.delete(userId, id);
     }
 
     @Override

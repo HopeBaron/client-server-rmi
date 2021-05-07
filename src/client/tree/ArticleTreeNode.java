@@ -14,6 +14,9 @@ public class ArticleTreeNode {
 
     @Override
     public String toString() {
+        if(!article.isShown()) {
+            return "Deleted - " + article.getTitle();
+        }
         return article.getTitle();
     }
 }

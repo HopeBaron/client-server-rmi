@@ -2,13 +2,16 @@ package server.factory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public final class ConnectionFactory {
-    String driverClassName = "org.mariadb.jdbc.Driver";
-    String connectionUrl = "jdbc:mysql://localhost/rmi";
-    String dbUser = "rmiUser";
-    String dbPwd = "rmi";
+    private final String driverClassName = "org.mariadb.jdbc.Driver";
+    private final String connectionUrl = "jdbc:mysql://localhost/rmi";
+    private final String dbUser = "rmiUser";
+    private final String dbPwd = "rmi";
+    private Connection conn;
+    private final String validateQuery = "SELECT 1";
 
     private static ConnectionFactory connectionFactory = null;
 
@@ -21,7 +24,14 @@ public final class ConnectionFactory {
     }
 
     public Connection getConnection() throws SQLException {
-        Connection conn = null;
+        if(conn != null) {
+            try (PreparedStatement statement = conn.prepareStatement(validateQuery)) {
+                statement.executeQuery();
+                return conn;
+            } catch (SQLException ignored) {
+
+            }
+        }
         conn = DriverManager.getConnection(connectionUrl, dbUser, dbPwd);
         return conn;
     }

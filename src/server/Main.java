@@ -2,11 +2,13 @@ package server;
 
 import common.rmi.Connector;
 import server.connection.ConnectorImpl;
+import server.factory.ConnectionFactory;
 
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) {
@@ -17,6 +19,12 @@ public class Main {
             registry.rebind("connector", connector);
         } catch (RemoteException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                ConnectionFactory.getInstance().getConnection().close();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         }
 
     }
