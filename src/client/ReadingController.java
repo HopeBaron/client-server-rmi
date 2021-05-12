@@ -2,6 +2,8 @@ package client;
 
 import client.tree.ArticleTreeNode;
 import client.tree.UserTreeNode;
+import common.exception.ErrorCode;
+import common.exception.RemoteAuthenticationException;
 import common.model.Article;
 import common.model.Permission;
 import common.model.User;
@@ -41,7 +43,6 @@ public class ReadingController extends JFrame {
 
         tree1.addTreeSelectionListener(e -> {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree1.getLastSelectedPathComponent();
-            if(node == null) return;
             Object userObject = node.getUserObject();
             updateContent();
             try {
@@ -75,7 +76,14 @@ public class ReadingController extends JFrame {
             }
             model.reload();
         } catch (RemoteException e) {
-            e.printStackTrace();
+            Throwable ex = e.getCause();
+            if (ex instanceof RemoteAuthenticationException) {
+                RemoteAuthenticationException exx = (RemoteAuthenticationException) ex;
+                ErrorCode code = exx.getErrorCode();
+                if (code == ErrorCode.MISSING_ACCESS) {
+                    dispose();
+                }
+            }
         }
     }
 
@@ -86,7 +94,6 @@ public class ReadingController extends JFrame {
             if (userObject instanceof UserTreeNode) {
                 User o = ((UserTreeNode) userObject).getUser();
                 connection.deleteUser(o.getId());
-                if (o.getId() == connection.getCurrentUserId()) dispose();
             }
             if (userObject instanceof ArticleTreeNode) {
                 Article o = ((ArticleTreeNode) userObject).getArticle();

@@ -3,7 +3,7 @@ package common.model;
 import java.io.Serializable;
 import java.time.Instant;
 
-public final class User implements Serializable {
+public final class User implements Entity, Serializable {
     private long id;
     private String username;
     private String password;
@@ -46,6 +46,18 @@ public final class User implements Serializable {
 
     public Permissions getPermission() {
         return permission;
+    }
+
+    public boolean isAdmin() {
+        return permission.contains(Permission.MODIFY_OTHERS);
+    }
+
+    public boolean canModify(Article article) {
+        return isAdmin() || id == article.getAuthor().getId();
+    }
+
+    public boolean canModify(User user) {
+        return (isAdmin()  && !user.isAdmin())|| id == user.id;
     }
 
     public Instant getRegistrationDate() {

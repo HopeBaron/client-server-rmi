@@ -2,11 +2,15 @@ package common.exception;
 
 import java.rmi.RemoteException;
 
-public final class RemoteAuthenticationException extends RemoteException {
+public class RemoteAuthenticationException extends RemoteException {
     ErrorCode errorCode;
 
-    public RemoteAuthenticationException(ErrorCode errorCode) {
-        super();
+    public RemoteAuthenticationException(ErrorCode errorCode, String message) {
+        super(message);
         this.errorCode = errorCode;
+    }
+
+    public ErrorCode getErrorCode() {
+        return errorCode;
     }
 }

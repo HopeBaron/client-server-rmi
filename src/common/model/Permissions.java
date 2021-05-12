@@ -22,7 +22,7 @@ public final class Permissions implements Serializable {
     }
 
     public boolean contains(Permissions permissions) {
-        return set.equals(permissions);
+        return set.equals(permissions.set);
     }
 
     public void add(Permission permission) {

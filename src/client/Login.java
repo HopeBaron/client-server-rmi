@@ -1,5 +1,6 @@
 package client;
 
+import common.exception.RemoteAuthenticationException;
 import common.rmi.Connection;
 import common.rmi.Connector;
 
@@ -7,7 +8,7 @@ import javax.swing.*;
 import java.rmi.RemoteException;
 import java.util.concurrent.ExecutionException;
 
-public class Login {
+public class Login extends JFrame {
     private JTextField usernameText;
     private JPasswordField passwordText;
     private JButton loginButton;
@@ -53,8 +54,11 @@ public class Login {
                         frame.setContentPane(mainInterface.getRoot());
                         frame.pack();
                         frame.setVisible(true);
-                    } catch (ExecutionException | InterruptedException ignored) {
-                        JOptionPane.showMessageDialog(root, "Fail!");
+                    } catch (ExecutionException | InterruptedException e) {
+                        Throwable ex = e.getCause().getCause();
+                        if(ex instanceof RemoteAuthenticationException) {
+                            JOptionPane.showMessageDialog(root, ex.getMessage());
+                        }
                     }
                 }
 

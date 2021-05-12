@@ -29,7 +29,7 @@ public final class ConnectorImpl implements Connector {
     public Connection authenticate(String username, String password) throws RemoteException {
         User userInDb = userService.getUserByName(username);
         if (userInDb == null || !userInDb.getPassword().equals(password))
-            throw new RemoteAuthenticationException(ErrorCode.INVALID_INFO);
+            throw new RemoteAuthenticationException(ErrorCode.INVALID_INFO, "Invalid user or password.");
         return new ConnectionImpl(userInDb.getId(), userService, articleService);
     }
 }
