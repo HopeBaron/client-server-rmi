@@ -32,4 +32,6 @@ public interface Connection extends Remote {
     long getCurrentUserId() throws RemoteException;
 
     User getCurrentUser() throws RemoteException;
+
+    Article updateArticle(Article article) throws RemoteException;
 }

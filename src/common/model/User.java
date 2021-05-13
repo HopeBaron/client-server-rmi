@@ -53,11 +53,11 @@ public final class User implements Entity, Serializable {
     }
 
     public boolean canModify(Article article) {
-        return isAdmin() || id == article.getAuthor().getId();
+        return canModify(article.getAuthor());
     }
 
     public boolean canModify(User user) {
-        return (isAdmin()  && !user.isAdmin())|| id == user.id;
+        return (isAdmin() && !user.isAdmin()) || id == user.id;
     }
 
     public Instant getRegistrationDate() {

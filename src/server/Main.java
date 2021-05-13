@@ -18,7 +18,7 @@ public class Main {
             Connector connector = (Connector) UnicastRemoteObject.exportObject(implementedConnector, 0);
             registry.rebind("connector", connector);
         } catch (RemoteException e) {
-            e.printStackTrace();
+            System.out.println("Make sure RMI Registry is enabled.");
         } finally {
             try {
                 ConnectionFactory.getInstance().getConnection().close();

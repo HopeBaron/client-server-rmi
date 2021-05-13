@@ -5,7 +5,6 @@ import client.tree.UserTreeNode;
 import common.exception.ErrorCode;
 import common.exception.RemoteAuthenticationException;
 import common.model.Article;
-import common.model.Permission;
 import common.model.User;
 import common.rmi.Connection;
 
@@ -23,17 +22,26 @@ public class ReadingController extends JFrame {
     private JButton refreshButton;
     private JButton deleteButton;
     private JButton saveButton;
+    private JButton editButton;
 
     public ReadingController(Connection connection) {
-        deleteButton.setEnabled(false);
         updateList(connection);
         refreshButton.addActionListener(e -> updateList(connection));
+        editButton.addActionListener(e -> {
+            try {
+                updateSelection(connection);
+                updateList(connection);
+                updateContent();
+            } catch (RemoteException remoteException) {
+                handleException(remoteException);
+            }
+        });
         saveButton.addActionListener(e -> {
             try {
                 connection.addArticle(new Article(0, textField1.getText(), editorPane1.getText(), connection.getCurrentUser(), true));
                 updateList(connection);
             } catch (RemoteException remoteException) {
-                remoteException.printStackTrace();
+                handleException(remoteException);
             }
         });
         deleteButton.addActionListener(e -> {
@@ -43,12 +51,13 @@ public class ReadingController extends JFrame {
 
         tree1.addTreeSelectionListener(e -> {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree1.getLastSelectedPathComponent();
+            if (node == null) return;
             Object userObject = node.getUserObject();
             updateContent();
             try {
                 updateButtons(connection, userObject);
             } catch (RemoteException remoteException) {
-                remoteException.printStackTrace();
+                handleException(remoteException);
             }
         });
     }
@@ -61,8 +70,6 @@ public class ReadingController extends JFrame {
         DefaultTreeModel model = (DefaultTreeModel) tree1.getModel();
         model.setRoot(new DefaultMutableTreeNode("Articles"));
         tree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-
-
         try {
             for (User user : connection.getUsers()) {
 
@@ -76,16 +83,11 @@ public class ReadingController extends JFrame {
             }
             model.reload();
         } catch (RemoteException e) {
-            Throwable ex = e.getCause();
-            if (ex instanceof RemoteAuthenticationException) {
-                RemoteAuthenticationException exx = (RemoteAuthenticationException) ex;
-                ErrorCode code = exx.getErrorCode();
-                if (code == ErrorCode.MISSING_ACCESS) {
-                    dispose();
-                }
-            }
+            handleException(e);
         }
     }
+
+
 
     private void deleteSelection(Connection connection) {
         try {
@@ -100,21 +102,34 @@ public class ReadingController extends JFrame {
                 connection.deleteArticle(o.getId());
             }
         } catch (RemoteException e) {
-            e.printStackTrace();
+           handleException(e);
         }
     }
 
-    private void updateButtons(Connection connection, Object node) throws RemoteException {
+    private void updateSelection(Connection connection) throws RemoteException {
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree1.getLastSelectedPathComponent();
+        if (node == null) return;
+        Object userObject = node.getUserObject();
+        if (!(userObject instanceof ArticleTreeNode)) return;
+        Article article = ((ArticleTreeNode) userObject).getArticle();
+        article.setContent(editorPane1.getText());
+        article.setTitle(textField1.getText());
+        connection.updateArticle(article);
+    }
 
+    private void updateButtons(Connection connection, Object node) throws RemoteException {
+        if (node == null) reset();
+        User currentUser = connection.getCurrentUser();
         if (node instanceof ArticleTreeNode) {
             Article article = ((ArticleTreeNode) node).getArticle();
-            deleteButton.setEnabled(article.getAuthor().getId() == connection.getCurrentUserId() ||
-                    connection.getCurrentUser().getPermission().contains(Permission.MODIFY_OTHERS));
+            boolean canModify = currentUser.canModify(article);
+            deleteButton.setEnabled(canModify);
+            editButton.setEnabled(canModify);
         }
         if (node instanceof UserTreeNode) {
             User user = ((UserTreeNode) node).getUser();
-            deleteButton.setEnabled(user.getId() == connection.getCurrentUserId() ||
-                    connection.getCurrentUser().getPermission().contains(Permission.MODIFY_OTHERS));
+            deleteButton.setEnabled(currentUser.canModify(user));
+            editButton.setEnabled(false);
 
         }
     }
@@ -127,6 +142,24 @@ public class ReadingController extends JFrame {
             Article o = ((ArticleTreeNode) userObject).getArticle();
             textField1.setText(o.getTitle());
             editorPane1.setText(o.getContent());
+        }
+    }
+
+    private void reset() {
+        editButton.setEnabled(false);
+        deleteButton.setEnabled(false);
+        editorPane1.setText("");
+        textField1.setText("");
+    }
+
+    private void handleException(RemoteException exception) {
+        Throwable internalError = exception.getCause();
+        if (internalError instanceof RemoteAuthenticationException) {
+            RemoteAuthenticationException asAuthException = (RemoteAuthenticationException) internalError;
+            JOptionPane.showMessageDialog(null, asAuthException.getMessage());
+            if (asAuthException.getErrorCode() == ErrorCode.MISSING_ACCESS) {
+                dispose();
+            }
         }
     }
 }

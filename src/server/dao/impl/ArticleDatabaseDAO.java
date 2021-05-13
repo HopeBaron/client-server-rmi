@@ -144,7 +144,7 @@ public class ArticleDatabaseDAO implements ArticleDAO {
     public boolean update(Article article) throws SQLException {
         Connection connection = ConnectionFactory.getInstance().getConnection();
         PreparedStatement statement = connection.prepareStatement(
-                "UPDATE articles SET title=?, content=?, show=? WHERE id=?"
+                "UPDATE articles SET title=?, content=?, shown=? WHERE id=?"
         );
         statement.setString(1, article.getTitle());
         statement.setString(2, article.getContent());

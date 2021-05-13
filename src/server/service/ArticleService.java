@@ -1,6 +1,9 @@
 package server.service;
 
-import common.exception.*;
+import common.exception.MissingAccessException;
+import common.exception.MissingPermissionException;
+import common.exception.RemoteAuthenticationException;
+import common.exception.RemoteInternalServerError;
 import common.model.Article;
 import common.model.User;
 import server.dao.behaviors.ArticleDAO;
@@ -65,7 +68,7 @@ public final class ArticleService {
             Article article = articleDAO.get(id);
             if (!invokerUser.isActive()) throw new MissingAccessException();
 
-            if (invokerUser.canModify(article))
+            if (!invokerUser.canModify(article))
                 throw new MissingPermissionException();
             else return articleDAO.delete(article.getId());
         } catch (SQLException e) {
@@ -81,6 +84,19 @@ public final class ArticleService {
             if (!invokerUser.isActive()) throw new MissingAccessException();
             else if (!invokerUser.isAdmin()) return articleDAO.getStateArticlesOf(target, true);
             else return articleDAO.getArticlesOf(target);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RemoteInternalServerError();
+        }
+    }
+
+    public Article updateArticle(long invoker, Article article) throws MissingAccessException, MissingPermissionException, RemoteInternalServerError {
+        try {
+            User invokerUser = userDAO.get(invoker);
+            if (!invokerUser.isActive()) throw new MissingAccessException();
+            else if (!invokerUser.canModify(articleDAO.get(article.getId()))) throw new MissingPermissionException();
+            else if (articleDAO.update(article)) return articleDAO.get(article.getId());
+            else return null;
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RemoteInternalServerError();

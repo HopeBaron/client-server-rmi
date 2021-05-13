@@ -20,11 +20,8 @@ public final class UserService {
     public List<User> getAll(long invoker) throws RemoteException {
         try {
             User invokerUser = userDAO.get(invoker);
-            if (!invokerUser.isActive()) {
-                throw new MissingAccessException();
-            } else if (!invokerUser.getPermission().contains(Permission.MODIFY_OTHERS))
-                return userDAO.getStateUsers(true);
-
+            if (!invokerUser.isActive()) throw new MissingAccessException();
+            else if (!invokerUser.isAdmin()) return userDAO.getStateUsers(true);
             else return userDAO.getAll();
 
         } catch (SQLException e) {
@@ -32,6 +29,7 @@ public final class UserService {
             throw new RemoteInternalServerError();
         }
     }
+
     public boolean delete(long invoker, long target) throws RemoteAuthenticationException, RemoteInternalServerError {
         try {
             User invokerUser = userDAO.get(invoker);
@@ -45,10 +43,11 @@ public final class UserService {
         }
 
     }
+
     public User getUser(long invoker, long id) throws RemoteException {
         try {
-        User invokerUser = userDAO.get(invoker);
-        User targetUser = userDAO.get(id);
+            User invokerUser = userDAO.get(invoker);
+            User targetUser = userDAO.get(id);
             if (!invokerUser.isActive()) {
                 throw new MissingPermissionException();
             } else if (!invokerUser.isAdmin() && !targetUser.isActive())
@@ -62,11 +61,11 @@ public final class UserService {
 
     public User newUser(User user) throws RemoteException {
         try {
-        User foundUser = userDAO.getUserByName(user.getUsername());
-        if(foundUser != null) throw new AlreadyExistException();
-        Permissions perms = new Permissions();
-        perms.add(Permission.WRITE);
-        user.setPermission(perms);
+            User foundUser = userDAO.getUserByName(user.getUsername());
+            if (foundUser != null) throw new AlreadyExistException();
+            Permissions perms = new Permissions();
+            perms.add(Permission.WRITE);
+            user.setPermission(perms);
 
             return userDAO.create(user);
         } catch (SQLException e) {
@@ -78,7 +77,7 @@ public final class UserService {
     public User getUserByName(String username) throws RemoteInternalServerError, RemoteAuthenticationException {
         try {
             User targetUser = userDAO.getUserByName(username);
-             if (!targetUser.isActive())
+            if (!targetUser.isActive())
                 return null;
             else return targetUser;
         } catch (SQLException e) {

@@ -80,4 +80,9 @@ public final class ConnectionImpl extends UnicastRemoteObject implements Connect
     public User getCurrentUser() throws RemoteException {
         return userService.getUser(userId, userId);
     }
+
+    @Override
+    public Article updateArticle(Article article) throws RemoteException {
+        return articleService.updateArticle(userId, article);
+    }
 }
