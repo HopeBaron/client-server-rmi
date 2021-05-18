@@ -16,30 +16,31 @@ import java.rmi.RemoteException;
 
 public class ReadingController extends JFrame {
     private JTree tree1;
-    private JEditorPane editorPane1;
     private JTextField textField1;
     private JPanel root;
     private JButton refreshButton;
     private JButton deleteButton;
     private JButton saveButton;
     private JButton editButton;
+    private JTextArea textArea1;
 
     public ReadingController(Connection connection) {
+        textArea1.setLineWrap(true);
         updateList(connection);
-        refreshButton.addActionListener(e -> updateList(connection));
+        refreshButton.addActionListener(e -> {
+            updateList(connection);
+            updateButtons(connection, null);
+        });
         editButton.addActionListener(e -> {
-            try {
-                updateSelection(connection);
-                updateList(connection);
-                updateContent();
-            } catch (RemoteException remoteException) {
-                handleException(remoteException);
-            }
+            updateSelection(connection);
+            updateList(connection);
+            updateContent();
         });
         saveButton.addActionListener(e -> {
             try {
-                connection.addArticle(new Article(0, textField1.getText(), editorPane1.getText(), connection.getCurrentUser(), true));
+                connection.addArticle(new Article(0, textField1.getText(), textArea1.getText(), connection.getCurrentUser(), true));
                 updateList(connection);
+                reset();
             } catch (RemoteException remoteException) {
                 handleException(remoteException);
             }
@@ -54,11 +55,7 @@ public class ReadingController extends JFrame {
             if (node == null) return;
             Object userObject = node.getUserObject();
             updateContent();
-            try {
-                updateButtons(connection, userObject);
-            } catch (RemoteException remoteException) {
-                handleException(remoteException);
-            }
+            updateButtons(connection, userObject);
         });
     }
 
@@ -88,7 +85,6 @@ public class ReadingController extends JFrame {
     }
 
 
-
     private void deleteSelection(Connection connection) {
         try {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree1.getLastSelectedPathComponent();
@@ -102,53 +98,65 @@ public class ReadingController extends JFrame {
                 connection.deleteArticle(o.getId());
             }
         } catch (RemoteException e) {
-           handleException(e);
+            handleException(e);
         }
     }
 
-    private void updateSelection(Connection connection) throws RemoteException {
+    private void updateSelection(Connection connection) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree1.getLastSelectedPathComponent();
         if (node == null) return;
         Object userObject = node.getUserObject();
         if (!(userObject instanceof ArticleTreeNode)) return;
         Article article = ((ArticleTreeNode) userObject).getArticle();
-        article.setContent(editorPane1.getText());
+        article.setContent(textArea1.getText());
         article.setTitle(textField1.getText());
-        connection.updateArticle(article);
+        try {
+            connection.updateArticle(article);
+        } catch (RemoteException exception) {
+            handleException(exception);
+
+        }
     }
 
-    private void updateButtons(Connection connection, Object node) throws RemoteException {
-        if (node == null) reset();
-        User currentUser = connection.getCurrentUser();
-        if (node instanceof ArticleTreeNode) {
-            Article article = ((ArticleTreeNode) node).getArticle();
-            boolean canModify = currentUser.canModify(article);
-            deleteButton.setEnabled(canModify);
-            editButton.setEnabled(canModify);
-        }
-        if (node instanceof UserTreeNode) {
-            User user = ((UserTreeNode) node).getUser();
-            deleteButton.setEnabled(currentUser.canModify(user));
-            editButton.setEnabled(false);
+    private void updateButtons(Connection connection, Object node) {
+        try {
+            if (node == null) reset();
+            User currentUser = connection.getCurrentUser();
+            if (node instanceof ArticleTreeNode) {
+                Article article = ((ArticleTreeNode) node).getArticle();
+                boolean canModify = currentUser.canModify(article);
+                deleteButton.setEnabled(canModify);
+                editButton.setEnabled(canModify);
+            }
+            if (node instanceof UserTreeNode) {
+                User user = ((UserTreeNode) node).getUser();
+                deleteButton.setEnabled(currentUser.canModify(user));
+                editButton.setEnabled(false);
 
+            }
+        } catch (RemoteException exception) {
+            handleException(exception);
         }
     }
 
     private void updateContent() {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree1.getLastSelectedPathComponent();
-        if (node == null) return;
+        if (node == null || node.isRoot()) {
+            reset();
+            return;
+        }
         Object userObject = node.getUserObject();
         if (userObject instanceof ArticleTreeNode) {
             Article o = ((ArticleTreeNode) userObject).getArticle();
             textField1.setText(o.getTitle());
-            editorPane1.setText(o.getContent());
+            textArea1.setText(o.getContent());
         }
     }
 
     private void reset() {
         editButton.setEnabled(false);
         deleteButton.setEnabled(false);
-        editorPane1.setText("");
+        textArea1.setText("");
         textField1.setText("");
     }
 
@@ -159,7 +167,9 @@ public class ReadingController extends JFrame {
             JOptionPane.showMessageDialog(null, asAuthException.getMessage());
             if (asAuthException.getErrorCode() == ErrorCode.MISSING_ACCESS) {
                 dispose();
+                return;
             }
+            JOptionPane.showMessageDialog(null, "Something unexpected happen. Please provide me with more info.");
         }
     }
 }

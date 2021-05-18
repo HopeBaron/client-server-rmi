@@ -6,7 +6,6 @@ import common.rmi.Connector;
 
 import javax.swing.*;
 import java.rmi.RemoteException;
-import java.util.concurrent.ExecutionException;
 
 public class Login extends JFrame {
     private JTextField usernameText;
@@ -37,35 +36,24 @@ public class Login extends JFrame {
                 JOptionPane.showMessageDialog(root, "Please enter a password.");
                 return;
             }
-            SwingWorker<Connection, Void> worker = new SwingWorker<Connection, Void>() {
-                @Override
-                protected Connection doInBackground() throws RemoteException {
 
-                    return connector.authenticate(userTextValue, finalPassword);
-                }
 
-                @Override
-                public void done() {
                     try {
-                        Connection connection = get();
+
+                        Connection connection = connector.authenticate(userTextValue, finalPassword);
 
                         ReadingController mainInterface = new ReadingController(connection);
                         JFrame frame = new JFrame();
                         frame.setContentPane(mainInterface.getRoot());
                         frame.pack();
                         frame.setVisible(true);
-                    } catch (ExecutionException | InterruptedException e) {
-                        Throwable ex = e.getCause().getCause();
-                        if(ex instanceof RemoteAuthenticationException) {
-                            JOptionPane.showMessageDialog(root, ex.getMessage());
+                    } catch (RemoteException ex) {
+                        Throwable exx = ex.getCause();
+                        if(exx instanceof RemoteAuthenticationException) {
+                            JOptionPane.showMessageDialog(root, exx.getMessage());
                         }
                     }
                 }
-
-            };
-            worker.execute();
-
-
-        });
+                );
     }
 }

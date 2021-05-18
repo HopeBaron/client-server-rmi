@@ -1,7 +1,7 @@
 package server.connection;
 
-import common.exception.ErrorCode;
-import common.exception.RemoteAuthenticationException;
+import common.exception.InactiveAccountException;
+import common.exception.InvalidInfoException;
 import common.model.Article;
 import common.model.User;
 import common.rmi.Connection;
@@ -28,8 +28,10 @@ public final class ConnectorImpl implements Connector {
 
     public Connection authenticate(String username, String password) throws RemoteException {
         User userInDb = userService.getUserByName(username);
-        if (userInDb == null || !userInDb.getPassword().equals(password))
-            throw new RemoteAuthenticationException(ErrorCode.INVALID_INFO, "Invalid user or password.");
+        if (userInDb == null || !userInDb.getPassword().equals(password)) {
+            throw new InvalidInfoException();
+        }
+        else if(!userInDb.isActive()) throw new InactiveAccountException();
         return new ConnectionImpl(userInDb.getId(), userService, articleService);
     }
 }

@@ -4,6 +4,7 @@ import common.rmi.Connector;
 import server.connection.ConnectorImpl;
 import server.factory.ConnectionFactory;
 
+import javax.swing.*;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;

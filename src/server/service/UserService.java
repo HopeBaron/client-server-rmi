@@ -77,8 +77,8 @@ public final class UserService {
     public User getUserByName(String username) throws RemoteInternalServerError, RemoteAuthenticationException {
         try {
             User targetUser = userDAO.getUserByName(username);
-            if (!targetUser.isActive())
-                return null;
+            if(targetUser == null) return null;
+            else if (!targetUser.isActive()) throw new InactiveAccountException();
             else return targetUser;
         } catch (SQLException e) {
             e.printStackTrace();
