@@ -16,9 +16,7 @@ public final class Permissions implements Serializable {
     private final BitSet set;
 
     public boolean contains(Permission perm) {
-        System.out.println(Arrays.toString(set.toByteArray()));
         return set.get(perm.getValue() / 2);
-
     }
 
     public boolean contains(Permissions permissions) {
