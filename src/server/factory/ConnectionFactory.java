@@ -4,27 +4,32 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 public final class ConnectionFactory {
-    private final String driverClassName = "org.mariadb.jdbc.Driver";
-    private final String connectionUrl = "jdbc:mysql://localhost/rmi";
-    private final String dbUser = "rmiUser";
-    private final String dbPwd = "rmi";
+    private final String connectionUrl;
+    private final String dbUser;
+    private final String dbPwd;
     private Connection conn;
-    private final String validateQuery = "SELECT 1";
 
     private static ConnectionFactory connectionFactory = null;
 
     private ConnectionFactory() {
+        ResourceBundle bundle = ResourceBundle.getBundle("database");
+        connectionUrl = bundle.getString("url");
+        dbUser = bundle.getString("dbUser");
+        dbPwd = bundle.getString("dbPass");
         try {
-            Class.forName(driverClassName);
+            Class.forName(bundle.getString("driver"));
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            System.out.println("Couldn't configure db, please check your properties file.");
         }
     }
 
     public Connection getConnection() throws SQLException {
-        if(conn != null) {
+        if (conn != null) {
+            String validateQuery = "SELECT 1";
             try (PreparedStatement statement = conn.prepareStatement(validateQuery)) {
                 statement.executeQuery();
                 return conn;
@@ -36,7 +41,7 @@ public final class ConnectionFactory {
         return conn;
     }
 
-    public static ConnectionFactory getInstance() {
+    public static synchronized ConnectionFactory getInstance() {
         if (connectionFactory == null) {
             connectionFactory = new ConnectionFactory();
         }

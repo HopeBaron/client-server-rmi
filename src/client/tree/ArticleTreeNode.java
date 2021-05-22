@@ -2,7 +2,7 @@ package client.tree;
 
 import common.model.Article;
 
-public class ArticleTreeNode {
+public final class ArticleTreeNode {
     Article article;
     public ArticleTreeNode(Article article) {
         this.article = article;

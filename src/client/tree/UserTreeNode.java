@@ -2,7 +2,7 @@ package client.tree;
 
 import common.model.User;
 
-public class UserTreeNode {
+public final class UserTreeNode {
     private User user;
     public UserTreeNode(User user) {
         this.user = user;
