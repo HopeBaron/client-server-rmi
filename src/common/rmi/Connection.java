@@ -25,8 +25,6 @@ public interface Connection extends Remote {
 
     List<User> getUsers() throws RemoteException;
 
-    User addUser(User user) throws RemoteException;
-
     Article addArticle(Article article) throws RemoteException;
 
     long getCurrentUserId() throws RemoteException;

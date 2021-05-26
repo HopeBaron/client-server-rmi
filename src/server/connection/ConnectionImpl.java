@@ -62,11 +62,6 @@ public final class ConnectionImpl extends UnicastRemoteObject implements Connect
 
 
     @Override
-    public User addUser(User user) throws RemoteException {
-        return null;
-    }
-
-    @Override
     public Article addArticle(Article article) throws RemoteException {
         return articleService.addArticle(userId, article);
     }

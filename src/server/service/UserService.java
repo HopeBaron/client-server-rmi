@@ -59,21 +59,6 @@ public final class UserService {
         }
     }
 
-    public User newUser(User user) throws RemoteException {
-        try {
-            User foundUser = userDAO.getUserByName(user.getUsername());
-            if (foundUser != null) throw new AlreadyExistException();
-            Permissions perms = new Permissions();
-            perms.add(Permission.WRITE);
-            user.setPermission(perms);
-
-            return userDAO.create(user);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new RemoteInternalServerError();
-        }
-    }
-
     public User getUserByName(String username) throws RemoteInternalServerError, RemoteAuthenticationException {
         try {
             User targetUser = userDAO.getUserByName(username);

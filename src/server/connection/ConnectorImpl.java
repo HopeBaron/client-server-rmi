@@ -10,16 +10,12 @@ import server.dao.behaviors.ArticleDAO;
 import server.dao.behaviors.UserDAO;
 import server.dao.impl.ArticleDatabaseDAO;
 import server.dao.impl.UserDatabaseDAO;
-import server.publisher.Publisher;
-import server.publisher.SetPublisher;
 import server.service.ArticleService;
 import server.service.UserService;
 
 import java.rmi.RemoteException;
 
 public final class ConnectorImpl implements Connector {
-    private final Publisher<User> userPublisher = new SetPublisher<>();
-    private final Publisher<Article> articlePublisher = new SetPublisher<>();
     private final UserDAO userDAO = new UserDatabaseDAO();
     private final ArticleDAO articleDAO = new ArticleDatabaseDAO(userDAO);
 
