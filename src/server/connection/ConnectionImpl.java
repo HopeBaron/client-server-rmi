@@ -24,7 +24,7 @@ public final class ConnectionImpl extends UnicastRemoteObject implements Connect
 
 
     public User getUser(long userId) throws RemoteException {
-        return userService.getUser(this.userId, userId);
+        return userService.getUser(userId);
     }
 
     public User getUserByName(String username) throws RemoteException {
@@ -73,7 +73,7 @@ public final class ConnectionImpl extends UnicastRemoteObject implements Connect
 
     @Override
     public User getCurrentUser() throws RemoteException {
-        return userService.getUser(userId, userId);
+        return userService.getUser(userId);
     }
 
     @Override

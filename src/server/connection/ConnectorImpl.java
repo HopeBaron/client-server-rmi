@@ -24,9 +24,7 @@ public final class ConnectorImpl implements Connector {
 
     public Connection authenticate(String username, String password) throws RemoteException {
         User userInDb = userService.getUserByName(username);
-        if (userInDb == null || !userInDb.getPassword().equals(password)) {
-            throw new InvalidInfoException();
-        }
+        if (userInDb == null || !userInDb.getPassword().equals(password)) throw new InvalidInfoException();
         else if(!userInDb.isActive()) throw new InactiveAccountException();
         return new ConnectionImpl(userInDb.getId(), userService, articleService);
     }

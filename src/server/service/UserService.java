@@ -1,8 +1,9 @@
 package server.service;
 
-import common.exception.*;
-import common.model.Permission;
-import common.model.Permissions;
+import common.exception.MissingAccessException;
+import common.exception.MissingPermissionException;
+import common.exception.RemoteAuthenticationException;
+import common.exception.RemoteInternalServerError;
 import common.model.User;
 import server.dao.behaviors.UserDAO;
 
@@ -11,7 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public final class UserService {
-    private UserDAO userDAO;
+    private final UserDAO userDAO;
 
     public UserService(UserDAO userDAO) {
         this.userDAO = userDAO;
@@ -44,15 +45,9 @@ public final class UserService {
 
     }
 
-    public User getUser(long invoker, long id) throws RemoteException {
+    public User getUser(long id) throws RemoteException {
         try {
-            User invokerUser = userDAO.get(invoker);
-            User targetUser = userDAO.get(id);
-            if (!invokerUser.isActive()) {
-                throw new MissingPermissionException();
-            } else if (!invokerUser.isAdmin() && !targetUser.isActive())
-                return null;
-            else return targetUser;
+            return userDAO.get(id);
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RemoteInternalServerError();
@@ -61,10 +56,7 @@ public final class UserService {
 
     public User getUserByName(String username) throws RemoteInternalServerError, RemoteAuthenticationException {
         try {
-            User targetUser = userDAO.getUserByName(username);
-            if(targetUser == null) return null;
-            else if (!targetUser.isActive()) throw new InactiveAccountException();
-            else return targetUser;
+            return userDAO.getUserByName(username);
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RemoteInternalServerError();
