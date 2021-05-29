@@ -15,43 +15,49 @@ import javax.swing.tree.TreeSelectionModel;
 import java.rmi.RemoteException;
 
 public class ReadingController extends JFrame {
-    private JTree tree1;
-    private JTextField textField1;
+    private JTree tree;
+    private JTextField titleField;
     private JPanel root;
     private JButton refreshButton;
     private JButton deleteButton;
     private JButton saveButton;
     private JButton editButton;
-    private JTextArea textArea1;
+    private JTextArea contentArea;
 
     public ReadingController(Connection connection) {
-        textArea1.setLineWrap(true);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        contentArea.setLineWrap(true);
+        reset();
         updateList(connection);
         refreshButton.addActionListener(e -> {
             updateList(connection);
             updateButtons(connection, null);
+            reset();
         });
         editButton.addActionListener(e -> {
             updateSelection(connection);
             updateList(connection);
-            updateContent();
+            reset();
         });
         saveButton.addActionListener(e -> {
             try {
-                connection.addArticle(new Article(0, textField1.getText(), textArea1.getText(), connection.getCurrentUser(), true));
-                updateList(connection);
-                reset();
+                connection.addArticle(new Article(0, titleField.getText(), contentArea.getText(), connection.getCurrentUser(), true));
             } catch (RemoteException remoteException) {
                 handleException(remoteException);
             }
+                updateList(connection);
+                reset();
+
         });
         deleteButton.addActionListener(e -> {
             deleteSelection(connection);
+            reset();
             updateList(connection);
+            updateButtons(connection, null);
         });
 
-        tree1.addTreeSelectionListener(e -> {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree1.getLastSelectedPathComponent();
+        tree.addTreeSelectionListener(e -> {
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
             if (node == null) return;
             Object userObject = node.getUserObject();
             updateContent();
@@ -64,9 +70,9 @@ public class ReadingController extends JFrame {
     }
 
     private void updateList(Connection connection) {
-        DefaultTreeModel model = (DefaultTreeModel) tree1.getModel();
+        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
         model.setRoot(new DefaultMutableTreeNode("Articles"));
-        tree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         try {
             for (User user : connection.getUsers()) {
 
@@ -75,7 +81,7 @@ public class ReadingController extends JFrame {
                     DefaultMutableTreeNode node = new DefaultMutableTreeNode(new ArticleTreeNode(article));
                     userNode.add(node);
                 }
-                DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree1.getModel().getRoot();
+                DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
                 root.add(userNode);
             }
             model.reload();
@@ -87,7 +93,8 @@ public class ReadingController extends JFrame {
 
     private void deleteSelection(Connection connection) {
         try {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree1.getLastSelectedPathComponent();
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+            if(node == null) return;
             Object userObject = node.getUserObject();
             if (userObject instanceof UserTreeNode) {
                 User o = ((UserTreeNode) userObject).getUser();
@@ -103,13 +110,13 @@ public class ReadingController extends JFrame {
     }
 
     private void updateSelection(Connection connection) {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree1.getLastSelectedPathComponent();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         if (node == null) return;
         Object userObject = node.getUserObject();
         if (!(userObject instanceof ArticleTreeNode)) return;
         Article article = ((ArticleTreeNode) userObject).getArticle();
-        article.setContent(textArea1.getText());
-        article.setTitle(textField1.getText());
+        article.setContent(contentArea.getText());
+        article.setTitle(titleField.getText());
         try {
             connection.updateArticle(article);
         } catch (RemoteException exception) {
@@ -140,7 +147,7 @@ public class ReadingController extends JFrame {
     }
 
     private void updateContent() {
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree1.getLastSelectedPathComponent();
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         if (node == null || node.isRoot()) {
             reset();
             return;
@@ -148,28 +155,29 @@ public class ReadingController extends JFrame {
         Object userObject = node.getUserObject();
         if (userObject instanceof ArticleTreeNode) {
             Article o = ((ArticleTreeNode) userObject).getArticle();
-            textField1.setText(o.getTitle());
-            textArea1.setText(o.getContent());
+            titleField.setText(o.getTitle());
+            contentArea.setText(o.getContent());
         }
     }
 
     private void reset() {
         editButton.setEnabled(false);
         deleteButton.setEnabled(false);
-        textArea1.setText("");
-        textField1.setText("");
+        contentArea.setText("");
+        titleField.setText("");
     }
 
     private void handleException(RemoteException exception) {
         Throwable internalError = exception.getCause();
         if (internalError instanceof RemoteAuthenticationException) {
             RemoteAuthenticationException asAuthException = (RemoteAuthenticationException) internalError;
-            JOptionPane.showMessageDialog(null, asAuthException.getMessage());
             if (asAuthException.getErrorCode() == ErrorCode.MISSING_ACCESS) {
-                dispose();
-                return;
+                setVisible(false);
+
             }
-            JOptionPane.showMessageDialog(null, "Something unexpected happen. Please provide me with more info.");
+
+            JOptionPane.showMessageDialog(null, asAuthException.getMessage());
+
         }
     }
 }

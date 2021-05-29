@@ -42,9 +42,9 @@ public class Login extends JFrame {
 
                         Connection connection = connector.authenticate(userTextValue, finalPassword);
 
-                        ReadingController mainInterface = new ReadingController(connection);
-                        JFrame frame = new JFrame();
-                        frame.setContentPane(mainInterface.getRoot());
+                        ReadingController frame = new ReadingController(connection);
+                        frame.setContentPane(frame.getRoot());
+                        frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
                         frame.pack();
                         frame.setVisible(true);
                     } catch (RemoteException ex) {

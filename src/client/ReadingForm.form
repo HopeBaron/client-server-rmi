@@ -12,7 +12,7 @@
     </properties>
     <border type="none"/>
     <children>
-      <component id="b05c3" class="javax.swing.JTextField" binding="textField1" default-binding="true">
+      <component id="b05c3" class="javax.swing.JTextField" binding="titleField" default-binding="true">
         <constraints>
           <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
             <preferred-size width="250" height="-1"/>
@@ -79,7 +79,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="32962" class="javax.swing.JTree" binding="tree1" default-binding="true">
+          <component id="32962" class="javax.swing.JTree" binding="tree" default-binding="true">
             <constraints/>
             <properties>
               <editable value="false"/>
@@ -95,7 +95,7 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="7379e" class="javax.swing.JTextArea" binding="textArea1" default-binding="true">
+          <component id="7379e" class="javax.swing.JTextArea" binding="contentArea" default-binding="true">
             <constraints/>
             <properties/>
           </component>
