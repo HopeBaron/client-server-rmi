@@ -6,7 +6,9 @@ public enum ErrorCode {
     MISSING_ACCESS(2),
     ALREADY_EXIST(3),
     MISSING_PERMISSION(4),
-    INACTIVE_ACCOUNT(5);
+    INACTIVE_ACCOUNT(5),
+    INVALID_ARTICLE(6),
+    INTERNAL_SERVER_ERROR(7);
 
     int code;
 

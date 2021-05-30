@@ -18,7 +18,7 @@ public final class UserService {
         this.userDAO = userDAO;
     }
 
-    public List<User> getAll(long invoker) throws RemoteException {
+    public List<User> getAll(long invoker) throws RemoteAuthenticationException {
         try {
             User invokerUser = userDAO.get(invoker);
             if (!invokerUser.isActive()) throw new MissingAccessException();
@@ -31,7 +31,7 @@ public final class UserService {
         }
     }
 
-    public boolean delete(long invoker, long target) throws RemoteAuthenticationException, RemoteInternalServerError {
+    public boolean delete(long invoker, long target) throws RemoteAuthenticationException {
         try {
             User invokerUser = userDAO.get(invoker);
             if (!invokerUser.isActive()) throw new MissingAccessException();
@@ -45,7 +45,7 @@ public final class UserService {
 
     }
 
-    public User getUser(long id) throws RemoteException {
+    public User getUser(long id) throws RemoteAuthenticationException {
         try {
             return userDAO.get(id);
         } catch (SQLException e) {
@@ -54,7 +54,7 @@ public final class UserService {
         }
     }
 
-    public User getUserByName(String username) throws RemoteInternalServerError, RemoteAuthenticationException {
+    public User getUserByName(String username) throws RemoteAuthenticationException {
         try {
             return userDAO.getUserByName(username);
         } catch (SQLException e) {

@@ -31,7 +31,6 @@ public class ReadingController extends JFrame {
         updateList(connection);
         refreshButton.addActionListener(e -> {
             updateList(connection);
-            updateButtons(connection, null);
             reset();
         });
         editButton.addActionListener(e -> {
@@ -51,9 +50,8 @@ public class ReadingController extends JFrame {
         });
         deleteButton.addActionListener(e -> {
             deleteSelection(connection);
-            reset();
             updateList(connection);
-            updateButtons(connection, null);
+            reset();
         });
 
         tree.addTreeSelectionListener(e -> {
@@ -177,7 +175,8 @@ public class ReadingController extends JFrame {
             }
 
             JOptionPane.showMessageDialog(null, asAuthException.getMessage());
-
+            return;
         }
+        JOptionPane.showMessageDialog(null, "Remote error occurred.");
     }
 }
