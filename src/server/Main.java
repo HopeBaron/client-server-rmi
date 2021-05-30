@@ -18,15 +18,17 @@ public class Main {
             Registry registry = LocateRegistry.getRegistry();
             Connector connector = (Connector) UnicastRemoteObject.exportObject(implementedConnector, 0);
             registry.rebind("connector", connector);
+            System.out.println("Connector is now bound... Server running");
         } catch (RemoteException e) {
             System.out.println("Make sure RMI Registry is enabled.");
-        } finally {
+        }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 ConnectionFactory.getInstance().getConnection().close();
+                System.out.println("DB connection closed... Bye!");
             } catch (SQLException throwables) {
-                throwables.printStackTrace();
+                System.out.println("Couldn't not close connection...");
             }
-        }
-
+        }));
     }
 }
