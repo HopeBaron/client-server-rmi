@@ -28,12 +28,12 @@ public class Login extends JFrame {
             String finalPassword = password;
 
             if (userTextValue == null || userTextValue.isEmpty()) {
-                JOptionPane.showMessageDialog(root, "Please enter a username.");
+                JOptionPane.showMessageDialog(null, "Please enter a username.");
                 return;
             }
 
             if (finalPassword == null || finalPassword.isEmpty()) {
-                JOptionPane.showMessageDialog(root, "Please enter a password.");
+                JOptionPane.showMessageDialog(null, "Please enter a password.");
                 return;
             }
 
@@ -50,8 +50,10 @@ public class Login extends JFrame {
                     } catch (RemoteException ex) {
                         Throwable exx = ex.getCause();
                         if(exx instanceof RemoteAuthenticationException) {
-                            JOptionPane.showMessageDialog(root, exx.getMessage());
+                            JOptionPane.showMessageDialog(null, exx.getMessage());
+                            return;
                         }
+                        JOptionPane.showMessageDialog(null, "Remote error occurred.");
                     }
                 }
                 );
