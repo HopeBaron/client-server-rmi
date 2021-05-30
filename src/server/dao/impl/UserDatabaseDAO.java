@@ -78,7 +78,7 @@ public class UserDatabaseDAO implements UserDAO {
     public boolean update(User user) throws SQLException {
         Connection connection = ConnectionFactory.getInstance().getConnection();
         PreparedStatement statement = connection.prepareStatement(
-                "UPDATE users SET username=?, password=?, permssions=?, active=?"
+                "UPDATE users SET username=?, password=?, permission=?, active=?"
         );
         statement.setString(1, user.getUsername());
         statement.setString(2, user.getPassword());
