@@ -51,7 +51,7 @@ public final class ArticleService {
         try {
             User invokerUser = userDAO.get(invoker);
             if (!invokerUser.isActive()) throw new MissingPermissionException();
-            if(article.getContent().isEmpty() || article.getTitle().isEmpty()) throw new InvalidArticleException();
+            if(article.getContent().trim().isEmpty() || article.getTitle().trim().isEmpty()) throw new InvalidArticleException();
             else return articleDAO.create(article);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -93,6 +93,7 @@ public final class ArticleService {
             User invokerUser = userDAO.get(invoker);
             if (!invokerUser.isActive()) throw new MissingAccessException();
             else if (!invokerUser.canModify(articleDAO.get(article.getId()))) throw new MissingPermissionException();
+            else if(article.getContent().trim().isEmpty() || article.getTitle().trim().isEmpty()) throw new InvalidArticleException();
             else if (articleDAO.update(article)) return articleDAO.get(article.getId());
             else return null;
         } catch (SQLException e) {
